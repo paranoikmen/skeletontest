@@ -36,6 +36,7 @@ class createTests {
                 result += `${attributes[i]}`
             }
         }
+
         return result
     }
 
