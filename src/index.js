@@ -1,17 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import {Auth0Provider} from "@auth0/auth0-react";
-
-const domain = process.env.SKELETON_GENERATOR_DOMAIN;
-const clientId = process.env.SKELETON_GENERATOR_CLIENT_ID
+import Context from "./components/Context";
 
 ReactDOM.render(
-  <Auth0Provider
-   domain={domain}
-   clientId={clientId}
-   redirectUri={window.location.origin}>
-    <App />
-  </Auth0Provider>,
+    <Context>
+        <App />
+    </Context>,
   document.getElementById('root')
 );

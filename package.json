@@ -7,16 +7,26 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.6.3",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.2",
+    "passport": "^0.4.1",
+    "passport-gitlab2": "^5.0.0",
+    "qs": "^6.9.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.2",
+    "react-simple-oauth2-login": "^0.2.0",
+    "sequelize": "^6.5.0",
+    "sequelize-cli": "^6.2.0",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "nodemon server/src/app.js",
+    "dev": "run-p server start"
   },
   "eslintConfig": {
     "extends": [
@@ -35,5 +45,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express-session": "^1.17.1",
+    "nodemon": "^2.0.7",
+    "npm-run-all": "^4.1.5",
+    "react-router-dom": "^5.2.0",
+    "session": "^0.1.0"
   }
 }
