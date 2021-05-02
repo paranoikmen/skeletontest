@@ -5,9 +5,9 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport')
 const GitlabStrategy = require('passport-gitlab2').Strategy;
+const request = require('request')
 
 dotenv.config();
-
 const app = express();
 
 mongoose.connect(`${process.env.START_MONGODB}${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}${process.env.END_MONGODB}`, {
@@ -44,50 +44,91 @@ passport.use(new GitlabStrategy({
         callbackURL: "http://localhost:4000/auth/gitlab/callback",
     },
     function(accessToken, refreshToken, profile, cb) {
-    // called on successful auth
-        console.log("auth success")
-        console.log(profile);
-        console.log(accessToken)
-        console.log(refreshToken)
-        cb(null, profile);
-        console.log(profile)
+        // called on successful auth
+        cb(null, profile, accessToken);
     }
 ));
 
 app.get('/auth/gitlab',
-    passport.authenticate('gitlab', { scope: ['profile']},
-    function (req, res) {
-        console.log(req)
-        console.log(res)
-    }));
+    passport.authenticate('gitlab', {scope: ['api']}));
 
 app.get('/auth/gitlab/callback',
-    passport.authenticate('gitlab', { failureRedirect: '/login' },
+    passport.authenticate('gitlab', { failureRedirect: '/login' }),
     function(req, res) {
         // Successful authentication, redirect home
-        console.log(req)
-        console.log("kek")
-        console.log(res)
+        console.log("auth success")
+        //console.log(req)
+        res.redirect('http://localhost:3000')
     }
-));
-
-app.get('/api/v4/projects', (req, res) => {
-    res.send("")
-})
+);
 
 app.get('/', (req, res) => {
     res.send("hello server")
-    console.log(req)
-    console.log(res)
 })
 
 app.get('/getuser', (req, res) => {
-    res.send("user page")
+    res.send(req.user)
 })
 
 app.listen(4000, () => {
     console.log("Server started")
 })
+
+const options = {
+    url: 'https://gitlab.com/api/v4/projects?pagination=keyset&order_by=id&sort=asc&membership=true',
+    headers: {
+        'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+    }
+};
+
+const options2 = {
+    url: 'https://gitlab.com/api/v4/projects/16592307/repository/branches',
+    headers: {
+        'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+    }
+};
+
+const options1 = {
+    url: 'https://gitlab.com/api/v4/projects/16592307/repository/tree?recursive=true&per_page=100',
+    headers: {
+        'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+    }
+};
+
+app.get('/projects', (req, res) => {
+    request.get(options, function (error, response, body) {
+        console.log(response.statusCode)
+        if (!error && response.statusCode == 200) {
+            const info = JSON.parse(body)
+            res.send(info)
+        }
+        else console.log(error);
+    })
+})
+
+app.get('/files', (req, res) => {
+    request.get(options1, function (error, response, body) {
+        console.log(response.statusCode)
+        if (!error && response.statusCode == 200) {
+            const info = JSON.parse(body)
+            res.send(info)
+        }
+        else console.log(error);
+    })
+})
+
+app.get('/branch', (req, res) => {
+    request.get(options2, function (error, response, body) {
+        console.log(response.statusCode)
+        if (!error && response.statusCode == 200) {
+            const info = JSON.parse(body)
+            res.send(info)
+        }
+        else console.log(error);
+    })
+})
+
+
 
 
 
