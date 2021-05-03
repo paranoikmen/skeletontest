@@ -38,6 +38,7 @@ passport.deserializeUser((user, done) => {
     return done(null, user)
 });
 
+let accessTokenForAccessUser
 passport.use(new GitlabStrategy({
         clientID: "6cf64f2a71b85cbc2b77122eaad79e9cffe4d5bf260216321531c7970ca92915",
         clientSecret: "180e33838a63d487d588325031badf234c284fb246fde8f98394121496ca52ba",
@@ -45,7 +46,8 @@ passport.use(new GitlabStrategy({
     },
     function(accessToken, refreshToken, profile, cb) {
         // called on successful auth
-        cb(null, profile, accessToken);
+        accessTokenForAccessUser = accessToken
+        cb(null, profile, accessToken)
     }
 ));
 
@@ -127,6 +129,49 @@ app.get('/branch', (req, res) => {
         else console.log(error);
     })
 })
+
+app.get('/branch/:projectId', (req, res) => {
+    const projectId = req.params.projectId
+
+    request.get({
+        url: `https://gitlab.com/api/v4/projects/${projectId}/repository/branches`,
+        headers: {
+            'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+        }
+    },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body)
+                res.send(info)
+            }
+            else console.log(error);
+    })
+})
+
+app.get('/files/:projectId/:branchName', (req, res) => {
+    const projectId = req.params.projectId
+    const branchName = req.params.branchName
+
+    request.get({
+            url: `https://gitlab.com/api/v4/projects/${projectId}/repository/tree?recursive=true&per_page=100&ref=${branchName}`,
+            headers: {
+                'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+            }
+        },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body)
+                res.send(info)
+            }
+            else console.log(error);
+        })
+})
+
+
+
+//todo заменить токен доступа
 
 
 
