@@ -151,7 +151,8 @@ app.get('/branch/:projectId', (req, res) => {
 
 app.get('/files/:projectId/:branchName', (req, res) => {
     const projectId = req.params.projectId
-    const branchName = req.params.branchName
+    let branchName = req.params.branchName.replace('.', '/')
+    console.log(projectId, branchName)
 
     request.get({
             url: `https://gitlab.com/api/v4/projects/${projectId}/repository/tree?recursive=true&per_page=100&ref=${branchName}`,
