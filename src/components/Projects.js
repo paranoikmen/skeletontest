@@ -9,7 +9,7 @@ const Projects = ({projects, setProjects, setProject}) => {
             setProjects(await response.json())
         }
         fetchData();
-    })
+    },[])
 
     return <div>
         Выберите проект

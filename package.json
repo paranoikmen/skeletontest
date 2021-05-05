@@ -14,12 +14,15 @@
     "passport-gitlab2": "^5.0.0",
     "qs": "^6.9.6",
     "react": "^17.0.1",
+    "react-checkbox-tree": "^1.6.0",
     "react-dom": "^17.0.1",
+    "react-dropdown-tree-select": "^2.5.1",
     "react-folder-tree": "^4.1.0",
     "react-scripts": "4.0.2",
     "react-simple-oauth2-login": "^0.2.0",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
+    "underscore": "^1.13.1",
     "web-vitals": "^1.1.0"
   },
   "scripts": {

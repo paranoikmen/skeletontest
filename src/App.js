@@ -6,7 +6,6 @@ import {useContext, useState} from "react";
 import {myContext} from "./components/Context"
 import Projects from "./components/Projects";
 import Branches from "./components/Branches";
-import Project from "./components/Project";
 import Files from "./components/Files";
 
 const App = () => {
@@ -14,11 +13,10 @@ const App = () => {
     //console.log(userObject)
 
     const [projects, setProjects] = useState([])
-    const [project, setProject] = useState([])
+    const [project, setProject] = useState()
     const [branches, setBranches] = useState([])
-    const [branch, setBranch] = useState([])
+    const [branch, setBranch] = useState()
     const [files, setFiles] = useState([])
-
 
     return (
     <BrowserRouter>

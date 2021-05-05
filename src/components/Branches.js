@@ -10,7 +10,7 @@ const Branches = ({project, branches, setBranches, setBranch}) => {
             setBranches(await response.json())
         }
         fetchData();
-    })
+    },[])
 
     return <div>
         branch
