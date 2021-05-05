@@ -1,10 +1,10 @@
 import React, {useEffect, useRef, useState} from "react";
 import DropdownTreeSelect from 'react-dropdown-tree-select'
 import 'react-dropdown-tree-select/dist/styles.css'
-
+import LoaderComp from "./Loader";
 
 const Files = ({project, branch, files, setFiles}) => {
-
+    const [fileTree, setFileTree] = useState([])
     useEffect(() => {
         async function fetchData() {
             const id = project['id']
@@ -12,12 +12,12 @@ const Files = ({project, branch, files, setFiles}) => {
             const response = await fetch(`http://localhost:4000/files/${id}/${branchName}`)
             const data = await response.json()
             setFiles(data)
+            setFileTree(transformFileTree(data))
         }
         fetchData();
-    }, []) // todo fix memory leaks
+    }, [])
 
-    const [fileArr, setFileArr] = useState([])
-    const transformFileTree = () => {
+    const transformFileTree = (files) => {
         const tree = {
             label: branch['name'],
             value: "root",
@@ -50,6 +50,7 @@ const Files = ({project, branch, files, setFiles}) => {
             recursiveTree(tree['children'], value)
         }
 
+        console.log(tree)
         return tree
     }
 
@@ -80,7 +81,7 @@ const Files = ({project, branch, files, setFiles}) => {
                             )
                         }
                         return
-                    } else if(value.hasOwnProperty('children')) {
+                    } else if (value.hasOwnProperty('children')) {
                         recursiveTree(value['children'], inputFile)
                     }
                 }
@@ -88,35 +89,30 @@ const Files = ({project, branch, files, setFiles}) => {
         }
     }
 
-    const [fileTree, setFileTree] = useState(transformFileTree())
     let nodes = []
-
-    const generateTest = () => {
-        setFileTree(transformFileTree())
-    }
 
     const showasdd = () => {
         console.log(nodes)
+        console.log(JSON.stringify(nodes))
     }
 
     const returnChildren = (initialFile) => {
-        for(let value of initialFile) {
-            if(value['type'] === 'tree') {
+        for (let value of initialFile) {
+            if (value['type'] === 'tree') {
                 returnChildren(value['children'])
-            }
-            else nodes.push(value)
+            } else nodes.push(value)
         }
     }
 
     const returnChildOnTree = (initialNode, initialFile = fileTree['children']) => {
         let path = initialNode['path'].split('/')
-        for(let value of initialFile) {
-            for(let name of path) {
-                if(value['label'] === name) {
+        for (let value of initialFile) {
+            for (let name of path) {
+                if (value['label'] === name) {
                     if (value.hasOwnProperty('children')) {
                         returnChildOnTree(initialNode, value['children'])
                     }
-                    if(initialNode['path'].endsWith(name)) {
+                    if (initialNode['path'].endsWith(name)) {
                         returnChildren(value['children'])
                     }
                 }
@@ -126,14 +122,12 @@ const Files = ({project, branch, files, setFiles}) => {
 
     const findAllCheckedNodes = (selectedNodes) => {
         nodes = []
-        for(let value of selectedNodes) {
-            if(value['type'] === 'tree') {
+        for (let value of selectedNodes) {
+            if (value['type'] === 'tree') {
                 returnChildOnTree(value)
-            }
-            else if(value['type'] === 'blob') {
+            } else if (value['type'] === 'blob') {
                 nodes.push(value)
-            }
-            else if(value['type'] === 'root') {
+            } else if (value['type'] === 'root') {
                 returnChildren(fileTree['children'])
             }
         }
@@ -145,16 +139,40 @@ const Files = ({project, branch, files, setFiles}) => {
         findAllCheckedNodes(selectedNodes)
     }
 
+    async function sendDataOnServer(input) {
+        const response = await fetch('http://localhost:4000/data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(input)
+        })
+        if (response.ok) {
+            return response.statusCode
+        }
+    }
+
     return <div>
-        files
-        <DropdownTreeSelect data={fileTree} onChange={onChange} showPartiallySelected={"true"} />
-        <button onClick={generateTest}>
-            Сгенерировать тесты!
-        </button>
-        <button onClick={showasdd}>
-            фвфвы
-        </button>
+        {
+            (fileTree.length || files.length) !== 0
+                ?
+                <div>
+                    Примечание: система возьмет только .java файлы
+                    <DropdownTreeSelect
+                        data={fileTree}
+                        onChange={onChange}
+                        showPartiallySelected={"true"}
+                        texts={{placeholder: 'Найти...'}}
+                    />
+                    <button onClick={showasdd}>
+                        Сгенерировать тесты!
+                    </button>
+                </div>
+                :
+                <LoaderComp/>
+        }
     </div>
+
 
 }
 

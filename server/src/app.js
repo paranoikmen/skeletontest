@@ -151,7 +151,7 @@ app.get('/branch/:projectId', (req, res) => {
 
 app.get('/files/:projectId/:branchName', (req, res) => {
     const projectId = req.params.projectId
-    let branchName = req.params.branchName.replace('.', '/')
+    const branchName = req.params.branchName.replace('.', '/')
     console.log(projectId, branchName)
 
     request.get({
@@ -170,6 +170,56 @@ app.get('/files/:projectId/:branchName', (req, res) => {
         })
 })
 
+app.get('/filecontent/:projectId/:branchId/:path', (req, res) => {
+    //16592307 feature/create-contracts
+    const projectId = req.params.projectId
+    const branchName = req.params.branchName
+    const filePath = req.params.path // . -> %2E    / -> $2F
+
+    request.get({
+            url: `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${filePath}/raw?ref=${branchName}`,
+            headers: {
+                'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+            }
+        },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                // const info = JSON.parse(body)
+                res.send(body)
+            }
+            else console.log(error);
+        })
+})
+
+//todo кидать набор файлов на сервер, заменить path
+app.get('/filecreate/:projectId/:branchId/:path', (req, res) => {
+    //16592307 feature/create-contracts
+    const projectId = req.params.projectId
+    const branchName = req.params.branchName
+    const filePath = req.params.path // . -> %2E    / -> $2F
+
+    request.post({ //todo сделать POST /projects/:id/repository/commits
+            url: `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${filePath}/raw?ref=${branchName}`,
+            headers: {
+                'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+            },
+            data: {
+                'branch': branchName,
+                'author_name': authorName,
+                'contetn': content,
+                'commit_message': 'generate tests'
+            }
+        },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body)
+                res.send(info)
+            }
+            else console.log(error);
+        })
+})
 //todo заменить токен доступа
 
 
