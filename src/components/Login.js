@@ -1,11 +1,12 @@
-import React from "react";
+import React, {useEffect} from "react";
 
 const Login = () => {
+
     const gitlabLogin = () => {
         window.location.href = "http://localhost:4000/auth/gitlab"
     }
 
-    return(
+    return (
         <div>
             login
             <button onClick={gitlabLogin}>

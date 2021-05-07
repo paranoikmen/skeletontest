@@ -14,7 +14,7 @@ mongoose.connect(`${process.env.START_MONGODB}${process.env.MONGODB_USERNAME}:${
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, () => {
-     console.log("Connect to mongoose")
+    console.log("Connect to mongoose")
 })
 
 //middleware
@@ -30,8 +30,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser((user,done) => {
-    return done(null, user)
+passport.serializeUser((user, done) => {
+    return done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
@@ -44,10 +44,10 @@ passport.use(new GitlabStrategy({
         clientSecret: "180e33838a63d487d588325031badf234c284fb246fde8f98394121496ca52ba",
         callbackURL: "http://localhost:4000/auth/gitlab/callback",
     },
-    function(accessToken, refreshToken, profile, cb) {
+    function (accessToken, refreshToken, profile, cb) {
         // called on successful auth
-        accessTokenForAccessUser = accessToken
-        cb(null, profile, accessToken)
+        profile.accessToken = accessToken
+        cb(null, profile)
     }
 ));
 
@@ -55,14 +55,18 @@ app.get('/auth/gitlab',
     passport.authenticate('gitlab', {scope: ['api']}));
 
 app.get('/auth/gitlab/callback',
-    passport.authenticate('gitlab', { failureRedirect: '/login' }),
-    function(req, res) {
+    passport.authenticate('gitlab', {failureRedirect: '/login'}),
+    function (req, res) {
         // Successful authentication, redirect home
         console.log("auth success")
-        //console.log(req)
-        res.redirect('http://localhost:3000')
+        res.redirect('http://localhost:3000/projects')
     }
 );
+
+app.get('/logout', (req, res) => {
+    req.logout()
+    res.send('logout success')
+})
 
 app.get('/', (req, res) => {
     res.send("hello server")
@@ -76,88 +80,28 @@ app.listen(4000, () => {
     console.log("Server started")
 })
 
-const options = {
-    url: 'https://gitlab.com/api/v4/projects?pagination=keyset&order_by=id&sort=asc&membership=true',
-    headers: {
-        'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
-    }
-};
 
-const options2 = {
-    url: 'https://gitlab.com/api/v4/projects/16592307/repository/branches',
-    headers: {
-        'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
-    }
-};
-
-const options1 = {
-    url: 'https://gitlab.com/api/v4/projects/16592307/repository/tree?recursive=true&per_page=100',
-    headers: {
-        'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
-    }
-};
-
-app.get('/projects', (req, res) => {
-    request.get(options, function (error, response, body) {
-        console.log(response.statusCode)
-        if (!error && response.statusCode == 200) {
-            const info = JSON.parse(body)
-            res.send(info)
-        }
-        else console.log(error);
-    })
-})
-
-app.get('/files', (req, res) => {
-    request.get(options1, function (error, response, body) {
-        console.log(response.statusCode)
-        if (!error && response.statusCode == 200) {
-            const info = JSON.parse(body)
-            res.send(info)
-        }
-        else console.log(error);
-    })
-})
-
-app.get('/branch', (req, res) => {
-    request.get(options2, function (error, response, body) {
-        console.log(response.statusCode)
-        if (!error && response.statusCode == 200) {
-            const info = JSON.parse(body)
-            res.send(info)
-        }
-        else console.log(error);
-    })
-})
-
-app.get('/branch/:projectId', (req, res) => {
-    const projectId = req.params.projectId
-
+app.get('/projects/:token', (req, res) => {
     request.get({
-        url: `https://gitlab.com/api/v4/projects/${projectId}/repository/branches`,
-        headers: {
-            'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
-        }
-    },
+            url: 'https://gitlab.com/api/v4/projects?pagination=keyset&order_by=id&sort=asc&membership=true',
+            headers: {
+                'Authorization': `Bearer ${req.params.token}`
+            }
+        },
         function (error, response, body) {
-            console.log(response.statusCode)
+            console.log("abc",response.statusCode)
             if (!error && response.statusCode == 200) {
                 const info = JSON.parse(body)
                 res.send(info)
-            }
-            else console.log(error);
-    })
+            } else console.log(error);
+        })
 })
 
-app.get('/files/:projectId/:branchName', (req, res) => {
-    const projectId = req.params.projectId
-    const branchName = req.params.branchName.replace('.', '/')
-    console.log(projectId, branchName)
-
+app.get('/files/:token', (req, res) => {
     request.get({
-            url: `https://gitlab.com/api/v4/projects/${projectId}/repository/tree?recursive=true&per_page=100&ref=${branchName}`,
+            url: 'https://gitlab.com/api/v4/projects/16592307/repository/tree?recursive=true&per_page=100',
             headers: {
-                'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+                'Authorization': `Bearer ${req.params.token}`
             }
         },
         function (error, response, body) {
@@ -165,13 +109,63 @@ app.get('/files/:projectId/:branchName', (req, res) => {
             if (!error && response.statusCode == 200) {
                 const info = JSON.parse(body)
                 res.send(info)
-            }
-            else console.log(error);
+            } else console.log(error);
         })
 })
 
-app.get('/filecontent/:projectId/:branchId/:path', (req, res) => {
-    //16592307 feature/create-contracts
+app.get('/branch/:token', (req, res) => {
+    request.get({
+            url: 'https://gitlab.com/api/v4/projects/16592307/repository/branches',
+            headers: {
+                'Authorization': `Bearer ${req.params.token}`
+            }
+        },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body)
+                res.send(info)
+            } else console.log(error);
+        })
+})
+
+app.get('/branch/:projectId/:token', (req, res) => {
+    const projectId = req.params.projectId;
+    request.get({
+            url: `https://gitlab.com/api/v4/projects/${projectId}/repository/branches`,
+            headers: {
+                'Authorization': `Bearer ${req.params.token}`
+            }
+        },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body)
+                res.send(info)
+            } else console.log(error);
+        })
+})
+
+app.get('/files/:projectId/:branchName/:token', (req, res) => {
+    const projectId = req.params.projectId
+    const branchName = req.params.branchName.replace('.', '/')
+
+    request.get({
+            url: `https://gitlab.com/api/v4/projects/${projectId}/repository/tree?recursive=true&per_page=100&ref=${branchName}`,
+            headers: {
+                'Authorization': `Bearer ${req.params.token}`
+            }
+        },
+        function (error, response, body) {
+            console.log(response.statusCode)
+            if (!error && response.statusCode == 200) {
+                const info = JSON.parse(body)
+                res.send(info)
+            } else console.log(error);
+        })
+})
+
+app.get('/filecontent/:projectId/:branchId/:path/:token', (req, res) => {
     const projectId = req.params.projectId
     const branchName = req.params.branchName
     const filePath = req.params.path // . -> %2E    / -> $2F
@@ -179,7 +173,7 @@ app.get('/filecontent/:projectId/:branchId/:path', (req, res) => {
     request.get({
             url: `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${filePath}/raw?ref=${branchName}`,
             headers: {
-                'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+                'Authorization': `Bearer ${req.params.token}`
             }
         },
         function (error, response, body) {
@@ -187,14 +181,12 @@ app.get('/filecontent/:projectId/:branchId/:path', (req, res) => {
             if (!error && response.statusCode == 200) {
                 // const info = JSON.parse(body)
                 res.send(body)
-            }
-            else console.log(error);
+            } else console.log(error);
         })
 })
 
 //todo кидать набор файлов на сервер, заменить path
-app.get('/filecreate/:projectId/:branchId/:path', (req, res) => {
-    //16592307 feature/create-contracts
+app.get('/filecreate/:projectId/:branchId/:path/:token', (req, res) => {
     const projectId = req.params.projectId
     const branchName = req.params.branchName
     const filePath = req.params.path // . -> %2E    / -> $2F
@@ -202,7 +194,7 @@ app.get('/filecreate/:projectId/:branchId/:path', (req, res) => {
     request.post({ //todo сделать POST /projects/:id/repository/commits
             url: `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${filePath}/raw?ref=${branchName}`,
             headers: {
-                'Authorization': 'Bearer bef08a68deb40fe230ef8f8420d5887617a154ff6a1dda0c7442745324645af2'
+                'Authorization': `Bearer ${req.params.token}`
             },
             data: {
                 'branch': branchName,
@@ -216,11 +208,15 @@ app.get('/filecreate/:projectId/:branchId/:path', (req, res) => {
             if (!error && response.statusCode == 200) {
                 const info = JSON.parse(body)
                 res.send(info)
-            }
-            else console.log(error);
+            } else console.log(error);
         })
 })
-//todo заменить токен доступа
+
+app.post('/data', async (req, res) => {
+    const data = [...req.body] // на вход массив из blob файлов
+    res.send(data)
+})
+
 
 
 

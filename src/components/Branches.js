@@ -2,27 +2,31 @@ import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import LoaderComp from "./Loader";
 
-const Branches = ({project, branches, setBranches, setBranch}) => {
+const Branches = ({user, setSessionStorageBranch, sessionStorageProject}) => {
+
+    const [branches, setBranches] = useState([])
 
     useEffect(() => {
         async function fetchData() {
-            const id = project['id']
-            const response = await fetch(`http://localhost:4000/branch/${id}`)
+            const id = sessionStorageProject['id']
+            const response = await fetch(`http://localhost:4000/branch/${id}/${user['accessToken']}`)
             setBranches(await response.json())
         }
 
         fetchData();
-    }, [])
+    }, [user])
 
     return <div>
         {
             branches.length !== 0
                 ?
                 <div>
-                    branch
+                    Выбери ветку:
                     <ul>
                         {branches.map((value, index) => (
-                            <li key={index} onClick={event => setBranch(value)}>
+                            <li key={index} onClick={event => {
+                                setSessionStorageBranch(value)
+                            }}>
                                 <Link to='/projects/branches/files'>
                                     {value['name']}
                                 </Link>

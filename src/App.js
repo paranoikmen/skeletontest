@@ -1,40 +1,87 @@
 import './App.css';
 import {BrowserRouter, Route, Switch} from "react-router-dom";
-import Home from "./components/Home";
-import Login from "./components/Login"
-import {useContext, useState} from "react";
-import {myContext} from "./components/Context"
+import {useEffect, useState} from "react";
 import Projects from "./components/Projects";
 import Branches from "./components/Branches";
 import Files from "./components/Files";
+import NavBar from "./components/NavBar";
+import axios from "axios";
+import {useSessionStorage} from 'react-use';
+import Login from "./components/Login";
 
 const App = () => {
-    const userObject = useContext(myContext)
-    //console.log(userObject)
 
-    const [projects, setProjects] = useState([])
-    const [project, setProject] = useState()
-    const [branches, setBranches] = useState([])
-    const [branch, setBranch] = useState()
-    const [files, setFiles] = useState([])
+    const [sessionStorageUserData, setSessionStorageUserData] = useSessionStorage('userData', []);
+    const [sessionStorageProjectData, setSessionStorageProjectData] = useSessionStorage('projectData', []);
+    const [sessionStorageBranchData, setSessionStorageBranchData] = useSessionStorage('branchData', []);
+
+    useEffect(() => {
+        async function fetchData() {
+            axios.get('http://localhost:4000/getuser', {
+                withCredentials: true
+            }).then(res => {
+                if (res.data) {
+                    console.log(res.data)
+                    setSessionStorageUserData(res.data)
+                }
+            })
+        }
+        fetchData()
+    }, [])
 
     return (
-    <BrowserRouter>
-        <Switch>
-            <Route path='/' exact component={Home} />
-            <Route path='/login' component={Login} />
-            <Route path='/projects' exact>
-                <Projects projects={projects} setProjects={setProjects} setProject={setProject}/>
-            </Route>
-            <Route path='/projects/branches' exact>
-                <Branches project={project} branches={branches} setBranches={setBranches} setBranch={setBranch}/>
-            </Route>
-            <Route>
-                <Files project={project} branch={branch} files={files} setFiles={setFiles}/>
-            </Route>
-        </Switch>
-    </BrowserRouter>
-  );
+        <BrowserRouter>
+            <Switch>
+                <Route path='/' exact>
+                    <NavBar
+                        user={sessionStorageUserData}
+                        setUser={setSessionStorageUserData}
+                        setBranch={setSessionStorageBranchData}
+                        setProject={setSessionStorageProjectData}
+                    />
+                    <Login />
+                </Route>
+                <Route path='/projects' exact>
+                    <NavBar
+                        user={sessionStorageUserData}
+                        setUser={setSessionStorageUserData}
+                        setBranch={setSessionStorageBranchData}
+                        setProject={setSessionStorageProjectData}
+                    />
+                    <Projects
+                        user={sessionStorageUserData}
+                        setSessionStorageProject={setSessionStorageProjectData}
+                    />
+                </Route>
+                <Route path='/projects/branches' exact>
+                    <NavBar
+                        user={sessionStorageUserData}
+                        setUser={setSessionStorageUserData}
+                        setBranch={setSessionStorageBranchData}
+                        setProject={setSessionStorageProjectData}
+                    />
+                    <Branches
+                        user={sessionStorageUserData}
+                        sessionStorageProject={sessionStorageProjectData}
+                        setSessionStorageBranch={setSessionStorageBranchData}
+                    />
+                </Route>
+                <Route path='/projects/branches/files' exact>
+                    <NavBar
+                        user={sessionStorageUserData}
+                        setUser={setSessionStorageUserData}
+                        setBranch={setSessionStorageBranchData}
+                        setProject={setSessionStorageProjectData}
+                    />
+                    <Files
+                        project={sessionStorageProjectData}
+                        branch={sessionStorageBranchData}
+                        user={sessionStorageUserData}
+                    />
+                </Route>
+            </Switch>
+        </BrowserRouter>
+    );
 };
 
 export default App;

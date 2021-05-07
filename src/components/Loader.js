@@ -4,7 +4,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 const LoaderComp = () => {
     return <div>
-        <Loader type="Puff" color="#FF4500" height={100} width={100}/>
+        <Loader type="Puff" color="#FF4500" height={50} width={50}/>
     </div>
 
 }

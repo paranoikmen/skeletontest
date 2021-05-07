@@ -3,19 +3,22 @@ import DropdownTreeSelect from 'react-dropdown-tree-select'
 import 'react-dropdown-tree-select/dist/styles.css'
 import LoaderComp from "./Loader";
 
-const Files = ({project, branch, files, setFiles}) => {
+const Files = ({project, branch, user}) => {
+
+    const [files, setFiles] = useState([])
     const [fileTree, setFileTree] = useState([])
+
     useEffect(() => {
         async function fetchData() {
             const id = project['id']
             const branchName = branch['name'].replace('/', '.')
-            const response = await fetch(`http://localhost:4000/files/${id}/${branchName}`)
+            const response = await fetch(`http://localhost:4000/files/${id}/${branchName}/${user['accessToken']}`)
             const data = await response.json()
             setFiles(data)
             setFileTree(transformFileTree(data))
         }
         fetchData();
-    }, [])
+    }, [user])
 
     const transformFileTree = (files) => {
         const tree = {
@@ -50,7 +53,6 @@ const Files = ({project, branch, files, setFiles}) => {
             recursiveTree(tree['children'], value)
         }
 
-        console.log(tree)
         return tree
     }
 
@@ -90,11 +92,6 @@ const Files = ({project, branch, files, setFiles}) => {
     }
 
     let nodes = []
-
-    const showasdd = () => {
-        console.log(nodes)
-        console.log(JSON.stringify(nodes))
-    }
 
     const returnChildren = (initialFile) => {
         for (let value of initialFile) {
@@ -148,8 +145,15 @@ const Files = ({project, branch, files, setFiles}) => {
             body: JSON.stringify(input)
         })
         if (response.ok) {
+            console.log(await response.json()) //todo убрать
             return response.statusCode
         }
+    }
+
+    const generateTests = () => {
+        console.log(nodes)
+        console.log(JSON.stringify(nodes))
+        sendDataOnServer(nodes)
     }
 
     return <div>
@@ -157,14 +161,15 @@ const Files = ({project, branch, files, setFiles}) => {
             (fileTree.length || files.length) !== 0
                 ?
                 <div>
-                    Примечание: система возьмет только .java файлы
+                    Выбери файл:
                     <DropdownTreeSelect
                         data={fileTree}
                         onChange={onChange}
                         showPartiallySelected={"true"}
                         texts={{placeholder: 'Найти...'}}
                     />
-                    <button onClick={showasdd}>
+                    Примечание: система возьмет только .java файлы
+                    <button onClick={generateTests}>
                         Сгенерировать тесты!
                     </button>
                 </div>

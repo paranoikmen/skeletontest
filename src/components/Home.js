@@ -1,11 +1,12 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import Login from "./Login";
 
 const Home = () => {
+
     return(
         <div>
             home client
-            <Login/>
+
         </div>
     )
 }
