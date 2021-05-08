@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import LoaderComp from "./Loader";
 
-const Projects = ({user, setSessionStorageProject}) => {
+const Projects = ({user}) => {
 
     const [projects, setProjects] = useState([])
 
@@ -23,10 +23,8 @@ const Projects = ({user, setSessionStorageProject}) => {
                     Выбери проект:
                     <ul>
                         {projects.map((value, index) => (
-                            <li key={index} onClick={event => {
-                                setSessionStorageProject(value)
-                            }}>
-                                <Link to='/projects/branches'>
+                            <li key={index}>
+                                <Link to={'/projects' + '/' + value['id'] + '/branches'}>
                                     {value['name_with_namespace']}
                                 </Link>
                             </li>
@@ -37,7 +35,6 @@ const Projects = ({user, setSessionStorageProject}) => {
                 <LoaderComp/>
         }
     </div>
-
 }
 
 export default Projects;

@@ -2,27 +2,28 @@ import React, {useEffect, useRef, useState} from "react";
 import DropdownTreeSelect from 'react-dropdown-tree-select'
 import 'react-dropdown-tree-select/dist/styles.css'
 import LoaderComp from "./Loader";
+import {useParams} from "react-router-dom";
 
-const Files = ({project, branch, user}) => {
+const Files = ({user}) => {
 
     const [files, setFiles] = useState([])
     const [fileTree, setFileTree] = useState([])
+    let {projectId, branchName} = useParams()
 
     useEffect(() => {
         async function fetchData() {
-            const id = project['id']
-            const branchName = branch['name'].replace('/', '.')
-            const response = await fetch(`http://localhost:4000/files/${id}/${branchName}/${user['accessToken']}`)
+            const response = await fetch(`http://localhost:4000/files/${projectId}/${branchName}/${user['accessToken']}`)
             const data = await response.json()
             setFiles(data)
             setFileTree(transformFileTree(data))
         }
+
         fetchData();
     }, [user])
 
     const transformFileTree = (files) => {
         const tree = {
-            label: branch['name'],
+            label: branchName.replace('%2F', '/'),
             value: "root",
             children: [],
             type: "root",
@@ -177,8 +178,6 @@ const Files = ({project, branch, user}) => {
                 <LoaderComp/>
         }
     </div>
-
-
 }
 
 export default Files;

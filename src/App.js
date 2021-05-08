@@ -1,6 +1,6 @@
 import './App.css';
-import {BrowserRouter, Route, Switch} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {BrowserRouter, Route, Switch, Redirect} from "react-router-dom";
+import {useEffect} from "react";
 import Projects from "./components/Projects";
 import Branches from "./components/Branches";
 import Files from "./components/Files";
@@ -11,9 +11,7 @@ import Login from "./components/Login";
 
 const App = () => {
 
-    const [sessionStorageUserData, setSessionStorageUserData] = useSessionStorage('userData', []);
-    const [sessionStorageProjectData, setSessionStorageProjectData] = useSessionStorage('projectData', []);
-    const [sessionStorageBranchData, setSessionStorageBranchData] = useSessionStorage('branchData', []);
+    const [user, setUser] = useSessionStorage('userData', []);
 
     useEffect(() => {
         async function fetchData() {
@@ -21,8 +19,7 @@ const App = () => {
                 withCredentials: true
             }).then(res => {
                 if (res.data) {
-                    console.log(res.data)
-                    setSessionStorageUserData(res.data)
+                    setUser(res.data)
                 }
             })
         }
@@ -34,49 +31,42 @@ const App = () => {
             <Switch>
                 <Route path='/' exact>
                     <NavBar
-                        user={sessionStorageUserData}
-                        setUser={setSessionStorageUserData}
-                        setBranch={setSessionStorageBranchData}
-                        setProject={setSessionStorageProjectData}
+                        user={user}
+                        setUser={setUser}
                     />
-                    <Login />
+                    {
+                        user.length !== 0
+                            ?
+                            <Redirect to='/projects'/>
+                            :
+                            <Login/>
+                    }
                 </Route>
                 <Route path='/projects' exact>
                     <NavBar
-                        user={sessionStorageUserData}
-                        setUser={setSessionStorageUserData}
-                        setBranch={setSessionStorageBranchData}
-                        setProject={setSessionStorageProjectData}
+                        user={user}
+                        setUser={setUser}
                     />
                     <Projects
-                        user={sessionStorageUserData}
-                        setSessionStorageProject={setSessionStorageProjectData}
+                        user={user}
                     />
                 </Route>
-                <Route path='/projects/branches' exact>
+                <Route path='/projects/:projectId/branches' exact>
                     <NavBar
-                        user={sessionStorageUserData}
-                        setUser={setSessionStorageUserData}
-                        setBranch={setSessionStorageBranchData}
-                        setProject={setSessionStorageProjectData}
+                        user={user}
+                        setUser={setUser}
                     />
                     <Branches
-                        user={sessionStorageUserData}
-                        sessionStorageProject={sessionStorageProjectData}
-                        setSessionStorageBranch={setSessionStorageBranchData}
+                        user={user}
                     />
                 </Route>
-                <Route path='/projects/branches/files' exact>
+                <Route path='/projects/:projectId/branches/:branchName/files' exact>
                     <NavBar
-                        user={sessionStorageUserData}
-                        setUser={setSessionStorageUserData}
-                        setBranch={setSessionStorageBranchData}
-                        setProject={setSessionStorageProjectData}
+                        user={user}
+                        setUser={setUser}
                     />
                     <Files
-                        project={sessionStorageProjectData}
-                        branch={sessionStorageBranchData}
-                        user={sessionStorageUserData}
+                        user={user}
                     />
                 </Route>
             </Switch>
