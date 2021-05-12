@@ -138,7 +138,7 @@ const Files = ({user}) => {
     }
 
     async function sendDataOnServer(input) {
-        const response = await fetch('http://localhost:4000/data', {
+        const response = await fetch(`http://localhost:4000/filecreate/${projectId}/${branchName}/${user['accessToken']}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -149,12 +149,6 @@ const Files = ({user}) => {
             console.log(await response.json()) //todo убрать
             return response.statusCode
         }
-    }
-
-    const generateTests = () => {
-        console.log(nodes)
-        console.log(JSON.stringify(nodes))
-        sendDataOnServer(nodes)
     }
 
     return <div>
@@ -170,7 +164,7 @@ const Files = ({user}) => {
                         texts={{placeholder: 'Найти...'}}
                     />
                     Примечание: система возьмет только .java файлы
-                    <button onClick={generateTests}>
+                    <button onClick={event => sendDataOnServer(nodes)}>
                         Сгенерировать тесты!
                     </button>
                 </div>
