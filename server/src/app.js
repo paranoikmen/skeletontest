@@ -40,8 +40,8 @@ passport.deserializeUser((user, done) => {
 });
 
 passport.use(new GitlabStrategy({
-        clientID: "6cf64f2a71b85cbc2b77122eaad79e9cffe4d5bf260216321531c7970ca92915",
-        clientSecret: "180e33838a63d487d588325031badf234c284fb246fde8f98394121496ca52ba",
+        clientID: `${process.env.GITLAB_CLIENT_ID}`,
+        clientSecret: `${process.env.GITLAB_SECRET}`,
         callbackURL: "http://localhost:4000/auth/gitlab/callback",
     },
     function (accessToken, refreshToken, profile, cb) {
@@ -198,13 +198,19 @@ app.post('/filecreate/:projectId/:branchName/:token', (req, res) => {
     let filePath
     let rawFile
     let skeletonTests
-    const arrOfFileData = []
+    const arrOfFileData = [{
+        action: 'create',
+        file_path: '/.gitlab-ci.yml',
+        content:
+            "image: maven:3.3.9-jdk-8\n" +
+            "\n" +
+            "build:\n" +
+            "  script: \"mvn install -B\""
+    }]
 
     for (let file of data) {
         if (file['path'].endsWith('.java') && !file['path'].includes('tests/')) {
-            console.log(file)
             filePath = file['path'].replace('/', '%2F').replace('.', '%2E')
-
             request.get({
                     url: `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${filePath}/raw?ref=${branchName}`,
                     headers: {
@@ -220,7 +226,7 @@ app.post('/filecreate/:projectId/:branchName/:token', (req, res) => {
                                 file_path: `/tests/test${file['label']}`,
                                 content: skeletonTests,
                         })
-                        if(file == data[data.length-1]) {
+                        if(file === data[data.length-1]) {
                             request.post({
                                     url: `https://gitlab.com/api/v4/projects/${projectId}/repository/commits`,
                                     headers: {

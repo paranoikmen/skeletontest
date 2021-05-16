@@ -1,0 +1,157 @@
+#root {
+    height: 100vh;
+    width: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+h3 {
+    font-size: medium;
+    font-weight: lighter;
+    user-select: none;
+}
+
+.header {
+    height: 10%;
+    background-color: rgb(157, 157, 157);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    text-align: center;
+}
+
+.logo_block {
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.container {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login_card {
+    height: 50px;
+    width: 240px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+    border-radius: 15px;
+    border: 1px solid black;
+    box-shadow: 0.5px 1.5px 2px black;
+    cursor: pointer;
+}
+
+.login_card:hover {
+    background-color: rgb(246, 246, 246);
+    box-shadow: 0.5px 1.5px 3px black;
+}
+
+.gitlab_logo {
+    height: 30px;
+    width: 30px;
+}
+
+.logout_card {
+    height: 30px;
+    width: 90px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    border: 0px solid black;
+    background: rgb(226, 226, 226);
+    cursor: pointer;
+    box-shadow: 0 0 1px black;
+}
+
+.logout_card:hover {
+    background: rgb(203, 203, 203);
+    box-shadow: 0 0 2px black;
+}
+
+.logout_logo {
+    height: 20px;
+    width: 20px;
+    margin-right: 5px;
+}
+
+.projects_container {
+    height: 90%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.projects_card {
+    margin-top: 20px;
+}
+
+.loader_container {
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+}
+
+.dropdown {
+    border-radius: 10px;
+}
+
+.generate_btn {
+    width: 160px;
+    text-align: center;
+    padding: 7px;
+    background: white;
+    border-radius: 15px;
+    border: 1px solid black;
+    user-select: none;
+    cursor: pointer;
+}
+
+.generate_btn:hover {
+    background-color: rgb(246, 246, 246);
+    box-shadow: 0.5px 0.5px 1px black;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    list-style-type: none;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    opacity: 70%;
+}

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import LoaderComp from "./Loader";
+import "./Styles.css"
 
 const Branches = ({user}) => {
 
@@ -17,11 +18,11 @@ const Branches = ({user}) => {
     }, [user])
 
 
-    return <div>
+    return <div className={"projects_container"}>
         {
             branches.length !== 0
                 ?
-                <div>
+                <div className={"projects_card"}>
                     Выбери ветку:
                     <ul>
                         {branches.map((value, index) => (
@@ -35,7 +36,8 @@ const Branches = ({user}) => {
                     </ul>
                 </div>
                 :
-                <LoaderComp/>
+                <div className={"loader_container"}><LoaderComp/></div>
+
         }
     </div>
 }

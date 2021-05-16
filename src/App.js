@@ -8,6 +8,8 @@ import NavBar from "./components/NavBar";
 import axios from "axios";
 import {useSessionStorage} from 'react-use';
 import Login from "./components/Login";
+import "./components/Styles.css"
+import Header from "./components/Header";
 
 const App = () => {
 
@@ -30,10 +32,9 @@ const App = () => {
         <BrowserRouter>
             <Switch>
                 <Route path='/' exact>
-                    <NavBar
+                    <Header
                         user={user}
-                        setUser={setUser}
-                    />
+                        setUser={setUser}/>
                     {
                         user.length !== 0
                             ?
@@ -43,7 +44,7 @@ const App = () => {
                     }
                 </Route>
                 <Route path='/projects' exact>
-                    <NavBar
+                    <Header
                         user={user}
                         setUser={setUser}
                     />
@@ -52,7 +53,7 @@ const App = () => {
                     />
                 </Route>
                 <Route path='/projects/:projectId/branches' exact>
-                    <NavBar
+                    <Header
                         user={user}
                         setUser={setUser}
                     />
@@ -61,7 +62,7 @@ const App = () => {
                     />
                 </Route>
                 <Route path='/projects/:projectId/branches/:branchName/files' exact>
-                    <NavBar
+                    <Header
                         user={user}
                         setUser={setUser}
                     />

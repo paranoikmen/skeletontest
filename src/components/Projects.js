@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import LoaderComp from "./Loader";
+import "./Styles.css"
 
 const Projects = ({user}) => {
 
@@ -15,11 +16,11 @@ const Projects = ({user}) => {
         fetchData();
     }, [user])
 
-    return <div>
+    return <div className={"projects_container"}>
         {
             projects.length !== 0
                 ?
-                <div>
+                <div className={"projects_card"}>
                     Выбери проект:
                     <ul>
                         {projects.map((value, index) => (
@@ -32,7 +33,7 @@ const Projects = ({user}) => {
                     </ul>
                 </div>
                 :
-                <LoaderComp/>
+                <div className={"loader_container"}><LoaderComp/></div>
         }
     </div>
 }

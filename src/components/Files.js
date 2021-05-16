@@ -3,6 +3,8 @@ import DropdownTreeSelect from 'react-dropdown-tree-select'
 import 'react-dropdown-tree-select/dist/styles.css'
 import LoaderComp from "./Loader";
 import {useParams} from "react-router-dom";
+import "./Styles.css"
+import Loader from "./Loader";
 
 const Files = ({user}) => {
 
@@ -146,30 +148,30 @@ const Files = ({user}) => {
             body: JSON.stringify(input)
         })
         if (response.ok) {
-            console.log(await response.json()) //todo убрать
+            alert("тесты сгенерировались, поздравляю!")
             return response.statusCode
         }
     }
 
-    return <div>
+    return <div className={"projects_container"}>
         {
             (fileTree.length || files.length) !== 0
                 ?
-                <div>
-                    Выбери файл:
+                <div className={"projects_card"}>
+                    <h3>Выберите файл:</h3>
                     <DropdownTreeSelect
                         data={fileTree}
                         onChange={onChange}
                         showPartiallySelected={"true"}
                         texts={{placeholder: 'Найти...'}}
                     />
-                    Примечание: система возьмет только .java файлы
-                    <button onClick={event => sendDataOnServer(nodes)}>
+                    <h3>Примечание: система возьмет только .java файлы</h3>
+                    <div className={"generate_btn"} onClick={event => sendDataOnServer(nodes)}>
                         Сгенерировать тесты!
-                    </button>
+                    </div>
                 </div>
                 :
-                <LoaderComp/>
+                <div className={"loader_container"}><LoaderComp/></div>
         }
     </div>
 }
