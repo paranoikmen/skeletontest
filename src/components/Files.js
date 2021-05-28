@@ -139,7 +139,12 @@ const Files = ({user}) => {
         findAllCheckedNodes(selectedNodes)
     }
 
+    const [resultOfTests,setResultOfTests] = useState(0)
     async function sendDataOnServer(input) {
+        if(nodes.length == 0) {
+            return alert("вы не выбрали файлы")
+        }
+        setResultOfTests(1)
         const response = await fetch(`http://localhost:4000/filecreate/${projectId}/${branchName}/${user['accessToken']}`, {
             method: 'POST',
             headers: {
@@ -148,7 +153,7 @@ const Files = ({user}) => {
             body: JSON.stringify(input)
         })
         if (response.ok) {
-            alert("тесты сгенерировались, поздравляю!")
+            setResultOfTests(2)
             return response.statusCode
         }
     }
@@ -169,6 +174,10 @@ const Files = ({user}) => {
                     <div className={"generate_btn"} onClick={event => sendDataOnServer(nodes)}>
                         Сгенерировать тесты!
                     </div>
+                    {
+                        resultOfTests === 1 ? <LoaderComp/> :
+                        (resultOfTests === 2) && <div>Тесты сгенерировались, поздравляю!</div>
+                    }
                 </div>
                 :
                 <div className={"loader_container"}><LoaderComp/></div>

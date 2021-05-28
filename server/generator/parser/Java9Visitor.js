@@ -25,7 +25,7 @@ class Java9Visitor extends antlr4.tree.ParseTreeVisitor {
 	attributesFlag = 0
 
 	fun(i){
-		this.test.push(i)
+		//this.test.push(i)
 	}
 
 	// Visit a parse tree produced by Java9Parser#literal.

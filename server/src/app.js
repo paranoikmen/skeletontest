@@ -15,7 +15,7 @@ mongoose.connect(`${process.env.START_MONGODB}${process.env.MONGODB_USERNAME}:${
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, () => {
-    console.log("Connect to mongoose")
+    //console.log("Connect to mongoose")
 })
 
 //middleware
@@ -189,11 +189,11 @@ app.post('/selectedFiles', async (req, res) => {
     res.send(data)
 })
 
-//todo кидать набор файлов на сервер, заменить path
-app.post('/filecreate/:projectId/:branchName/:token', (req, res) => {
-    const data = [...req.body] // на вход массив из blob файлов
+app.post('/filecreate/:projectId/:branchName/:token', async (req, res) => {
+    const data = [...req.body] // на вход массив из blob файлов которые будем тестировать
     const projectId = req.params.projectId
     const branchName = req.params.branchName
+    console.log("kek",data)
 
     let filePath
     let rawFile
@@ -210,24 +210,26 @@ app.post('/filecreate/:projectId/:branchName/:token', (req, res) => {
 
     for (let file of data) {
         if (file['path'].endsWith('.java') && !file['path'].includes('tests/')) {
+            console.log("filekek",file)
             filePath = file['path'].replace('/', '%2F').replace('.', '%2E')
-            request.get({
+            await request.get({
                     url: `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${filePath}/raw?ref=${branchName}`,
                     headers: {
                         'Authorization': `Bearer ${req.params.token}`
                     }
                 },
-                function (error, response, body) {
+                async function (error, response, body) {
                     if (!error && response.statusCode == 200) {
                         rawFile = body
                         skeletonTests = parser(rawFile)
-                        arrOfFileData.push({
-                                action: 'create',
-                                file_path: `/tests/test${file['label']}`,
-                                content: skeletonTests,
+                        await arrOfFileData.push({
+                            action: 'create',
+                            file_path: `/tests/test${file['label']}`,
+                            content: skeletonTests,
                         })
-                        if(file === data[data.length-1]) {
-                            request.post({
+                        if (file === data[data.length - 1]) {
+                            console.log("lolarr",arrOfFileData)
+                            await request.post({
                                     url: `https://gitlab.com/api/v4/projects/${projectId}/repository/commits`,
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -236,13 +238,12 @@ app.post('/filecreate/:projectId/:branchName/:token', (req, res) => {
                                     body: JSON.stringify({
                                         branch: branchName,
                                         commit_message: 'Generate tests',
-                                        actions: arrOfFileData,
+                                        actions: [...arrOfFileData],
                                     }),
                                 },
-                                function (error, response, body) {
-                                    if (!error && response.statusCode == 200) {
-                                        const info = JSON.parse(body);
-                                        res.send(info);
+                                async function (error, response, body) {
+                                    if (!error && (response.statusCode == 201 || response.statusCode == 200)) {
+                                        await res.send(response);
                                     } else console.log(error);
                                 }
                             )

@@ -4,7 +4,6 @@ import {useEffect} from "react";
 import Projects from "./components/Projects";
 import Branches from "./components/Branches";
 import Files from "./components/Files";
-import NavBar from "./components/NavBar";
 import axios from "axios";
 import {useSessionStorage} from 'react-use';
 import Login from "./components/Login";

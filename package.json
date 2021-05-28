@@ -31,7 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject",
     "server": "nodemon server/src/app.js",
     "dev": "run-p server start"
@@ -60,6 +60,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express-session": "^1.17.1",
+    "jest": "^27.0.1",
     "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "react-router-dom": "^5.2.0",
